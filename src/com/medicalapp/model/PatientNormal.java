@@ -11,7 +11,7 @@ public class PatientNormal extends Patient {
     public String getRoomNumber() { return roomNumber; }
 
     @Override
-    public String getType() {
-        return "NORMAL - Room " + roomNumber;
+    public boolean isConditionDangerous(MedicalData data) {
+        return data.getPulse() > 110 || data.getPressure() > 150;
     }
 }

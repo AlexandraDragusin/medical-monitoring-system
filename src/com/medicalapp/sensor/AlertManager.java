@@ -20,8 +20,14 @@ public class AlertManager implements Runnable {
         System.out.println("[ALERTS] Alarm system is active...");
         while (active || !hospitalData.getAlerts().isEmpty()) {
             try {
-                String msg = hospitalData.getAlerts().poll(1, TimeUnit.SECONDS);
-                if (msg != null) {
+                if (active && hospitalData.getAlerts().isEmpty()) {
+                    Thread.sleep(100);
+
+                    if (!active) break;
+                }
+
+                if (!hospitalData.getAlerts().isEmpty()) {
+                    String msg = hospitalData.getAlerts().take();
                     System.out.println("\n EMERGENCY: " + msg);
                 }
             } catch (InterruptedException e) {

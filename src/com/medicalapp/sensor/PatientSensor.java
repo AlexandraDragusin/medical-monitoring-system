@@ -26,13 +26,15 @@ public class PatientSensor implements Runnable {
             MedicalData data = new MedicalData(pulse, pressure);
             patient.addData(data);
 
-            MedicineResult result = MedicineService.masterCheck.check(data);
+            if (patient.isConditionDangerous(data)) {
+                MedicineResult medicine = MedicineService.masterCheck.check(data);
 
-            if (result.isUrgent()) {
-                String text = String.format("ALERT FOR %s -> %s [Values: %s]",
-                        patient.getName(), result, data);
+                String text = String.format("ALERT FOR %s (%s) -> Recommended action: %s [Values: %s]",
+                        patient.getName(), patient.getClass().getSimpleName(), medicine, data);
+
                 hospitalData.addAlert(text);
             }
+
         } catch (Exception e) {
             System.err.println("Sensor error: " + e.getMessage());
         }

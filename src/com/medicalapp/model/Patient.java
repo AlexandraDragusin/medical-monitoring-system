@@ -8,6 +8,8 @@ public abstract class Patient {
     private final String id;
     private final String name;
     private final int age;
+
+    // Mai multi senzori vor scrie concurent date in aceasta lista, avem nveoie de sincronizare
     private final List<MedicalData> history = Collections.synchronizedList(new ArrayList<>());
 
     public Patient(String id, String name, int age) {
@@ -16,7 +18,7 @@ public abstract class Patient {
         this.age = age;
     }
 
-    public abstract String getType();
+    public abstract boolean isConditionDangerous(MedicalData data);
 
     public void addData(MedicalData data) {
         this.history.add(data);

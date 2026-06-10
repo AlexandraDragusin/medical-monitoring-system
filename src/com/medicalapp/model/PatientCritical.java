@@ -1,5 +1,6 @@
 package com.medicalapp.model;
 
+// Pacient la terapie intensiva
 public class PatientCritical extends Patient {
     private final int bedNumber;
 
@@ -11,7 +12,10 @@ public class PatientCritical extends Patient {
     public int getBedNumber() { return bedNumber; }
 
     @Override
-    public String getType() {
-        return "CRITICAL - ICU Bed #" + bedNumber;
+    public boolean isConditionDangerous(MedicalData data) {
+        if (getAge() >= 60) {
+            return data.getPulse() > 95 || data.getPressure() > 135;
+        }
+        return data.getPulse() > 105 || data.getPressure() > 145;
     }
 }
