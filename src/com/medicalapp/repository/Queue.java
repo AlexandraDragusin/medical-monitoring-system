@@ -9,8 +9,10 @@ public class Queue implements Serializable {
 
     private final List<String> list = new LinkedList<>();
 
+    // un singur thread o poate accesa la un moment dat
     public synchronized void put(String alert) {
         list.add(alert);
+        // anunta thread-urile care asteapta ca o alerta sa fie adaugata
         this.notifyAll();
     }
 
@@ -19,7 +21,7 @@ public class Queue implements Serializable {
             // daca nu sunt alerte, asteptam pana apare una
             this.wait();
         }
-        return list.remove(0); // FIFO
+        return list.remove(0);
     }
 
     public synchronized boolean isEmpty() {

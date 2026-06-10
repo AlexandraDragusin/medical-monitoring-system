@@ -49,8 +49,8 @@ public class Main {
         reportService.getMaxPulse(list)
                 .ifPresent(max -> System.out.println("Max pulse found today: " + max + " bpm"));
 
-        IntSummaryStatistics stats = reportService.getStats(p1);
-        System.out.println("Stats for " + p1.getName() + " -> Average Pulse: " + stats.getAverage() + " bpm");
+        double averagePulse = reportService.getAveragePulse(p1);
+        System.out.println("Average pulse for " + p1.getName() + " -> Average Pulse: " + averagePulse + " bpm");
 
         System.out.println("\nDemographics:");
         reportService.groupByAge(hospital.getAll())

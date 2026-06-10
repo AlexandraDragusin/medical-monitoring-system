@@ -1,7 +1,6 @@
 package com.medicalapp.service;
 
 public class MedicineService {
-
     public static final PatientCheck pulseCheck = data -> {
         if (data.getPulse() > 110) {
             return new MedicineResult("Beta-Blocker", 10, true);
@@ -16,6 +15,7 @@ public class MedicineService {
         return new MedicineResult("None", 0, false);
     };
 
+    // Implementarea metodei check va fi realizata prin combinarea celor doua check-uri existente
     public static final PatientCheck masterCheck = pulseCheck.andThenCheck(pressureCheck);
 
     public static boolean isSystemBusy(int activeSensors) {

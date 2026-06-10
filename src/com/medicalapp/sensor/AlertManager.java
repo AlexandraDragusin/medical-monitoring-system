@@ -5,6 +5,8 @@ import java.util.concurrent.TimeUnit;
 
 public class AlertManager implements Runnable {
     private final HospitalData hospitalData;
+
+    // volatile face ca modificarea variabilei sa fie vazuta instantaneu de toate thread-urile care o acceseaza
     private volatile boolean active = true;
 
     public AlertManager(HospitalData hospitalData) {
@@ -18,6 +20,7 @@ public class AlertManager implements Runnable {
     @Override
     public void run() {
         System.out.println("[ALERTS] Alarm system is active...");
+
         while (active || !hospitalData.getAlerts().isEmpty()) {
             try {
                 if (active && hospitalData.getAlerts().isEmpty()) {
@@ -26,8 +29,10 @@ public class AlertManager implements Runnable {
                     if (!active) break;
                 }
 
+                // daca coada nu e goala, preluam si afisam mesajul de alerta
                 if (!hospitalData.getAlerts().isEmpty()) {
                     String msg = hospitalData.getAlerts().take();
+
                     System.out.println("\n EMERGENCY: " + msg);
                 }
             } catch (InterruptedException e) {

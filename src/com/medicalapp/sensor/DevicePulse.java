@@ -5,7 +5,6 @@ import com.medicalapp.model.MedicalData;
 import com.medicalapp.repository.HospitalData;
 import java.util.Random;
 
-// Schimbat din "implements Runnable" în "implements Device"
 public class DevicePulse implements Device {
     private final Patient patient;
     private final Random random = new Random();

@@ -45,6 +45,7 @@ public class Test1 {
     public void testExceptionsData() {
         WrongFormatException ex1 = new WrongFormatException("BAD_TEXT", "Format error");
         DeviceErrorException ex2 = new DeviceErrorException("DEV-101", ex1);
+
         assertEquals("BAD_TEXT", ex1.getRawData());
         assertEquals("DEV-101", ex2.getDeviceId());
     }

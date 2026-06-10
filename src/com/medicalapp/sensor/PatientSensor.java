@@ -37,8 +37,10 @@ public class PatientSensor implements Device {
 
             if (patient.isConditionDangerous(data)) {
                 MedicineResult medicine = MedicineService.masterCheck.check(data);
+
                 String text = String.format("ALERT FOR %s (%s) -> Action: %s [Values: %s]",
                         patient.getName(), getName(), medicine, data);
+
                 hospitalData.addAlert(text);
             }
         } catch (Exception e) {

@@ -4,6 +4,7 @@ import com.medicalapp.exception.BadDataException;
 import java.time.LocalDateTime;
 
 public class MedicalData {
+    // campuri marcate cu final pentru a face obiectul imutabil
     private final int pulse;
     private final int pressure;
     private final LocalDateTime time;
