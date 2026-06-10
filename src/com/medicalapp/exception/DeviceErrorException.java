@@ -8,5 +8,7 @@ public class DeviceErrorException extends Exception {
         this.deviceId = deviceId;
     }
 
-    public String getDeviceId() { return deviceId; }
+    public String getDeviceId() {
+        return deviceId;
+    }
 }

@@ -8,5 +8,7 @@ public class PatientErrorException extends RuntimeException {
         this.patientId = patientId;
     }
 
-    public String getPatientId() { return patientId; }
+    public String getPatientId() {
+        return patientId;
+    }
 }

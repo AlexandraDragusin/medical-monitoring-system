@@ -1,7 +1,5 @@
 package com.medicalapp.service;
 
-import com.medicalapp.model.MedicalData;
-
 public class MedicineService {
 
     public static final PatientCheck pulseCheck = data -> {

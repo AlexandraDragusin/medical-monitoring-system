@@ -9,5 +9,7 @@ public class WrongFormatException extends Exception {
         this.rawData = rawData;
     }
 
-    public String getRawData() { return rawData; }
+    public String getRawData() {
+        return rawData;
+    }
 }

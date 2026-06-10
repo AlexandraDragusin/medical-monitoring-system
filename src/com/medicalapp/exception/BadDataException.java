@@ -10,6 +10,11 @@ public class BadDataException extends RuntimeException {
         this.pressure = pressure;
     }
 
-    public int getPulse() { return pulse; }
-    public int getPressure() { return pressure; }
+    public int getPulse() {
+        return pulse;
+    }
+
+    public int getPressure() {
+        return pressure;
+    }
 }

@@ -11,19 +11,17 @@ public class ReportService {
         return list.stream()
                 .flatMap(p -> p.getHistory().stream())
                 .map(MedicalData::getPulse)
-                .reduce(Integer::max);
+                .max(Integer::compareTo);
     }
 
     public IntSummaryStatistics getStats(Patient p) {
         return p.getHistory().stream()
-                .collect(Collectors.summarizingInt(MedicalData::getPulse));
+                .mapToInt(MedicalData::getPulse)
+                .summaryStatistics();
     }
 
     public Map<String, List<Patient>> groupByAge(Collection<Patient> list) {
         return list.stream()
-                .collect(Collectors.groupingBy(p -> {
-                    if (p.getAge() >= 60) return "OLD_AGE_RISK";
-                    return "YOUNG_AGE_STABLE";
-                }));
+                .collect(Collectors.groupingBy(p -> p.getAge() >= 60 ? "OLD_AGE_RISK" : "YOUNG_AGE_STABLE"));
     }
 }

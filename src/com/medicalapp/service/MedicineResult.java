@@ -11,9 +11,17 @@ public class MedicineResult {
         this.urgent = urgent;
     }
 
-    public String getName() { return name; }
-    public int getDose() { return dose; }
-    public boolean isUrgent() { return urgent; }
+    public String getName() {
+        return name;
+    }
+
+    public int getDose() {
+        return dose;
+    }
+
+    public boolean isUrgent() {
+        return urgent;
+    }
 
     @Override
     public String toString() {
