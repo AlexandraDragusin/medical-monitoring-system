@@ -11,6 +11,8 @@ public class AlertManager implements Runnable {
 
     public AlertManager(HospitalData hospitalData) {
         this.hospitalData = hospitalData;
+
+        new Thread(this).start();
     }
 
     public void stop() {

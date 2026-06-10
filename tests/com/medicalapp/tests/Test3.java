@@ -7,7 +7,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class Test3 {
-
     @Test
     public void testLambdas() {
         MedicalData highBp = new MedicalData(70, 160);

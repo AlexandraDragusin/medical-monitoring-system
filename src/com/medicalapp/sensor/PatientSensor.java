@@ -11,10 +11,17 @@ public class PatientSensor implements Device {
     private final Patient patient;
     private final HospitalData hospitalData;
     private final Random random = new Random();
+    private volatile boolean active = true;
 
     public PatientSensor(Patient patient, HospitalData hospitalData) {
         this.patient = patient;
         this.hospitalData = hospitalData;
+
+        new Thread(this).start();
+    }
+
+    public void stop() {
+        this.active = false;
     }
 
     @Override
@@ -31,20 +38,31 @@ public class PatientSensor implements Device {
 
     @Override
     public void run() {
-        try {
-            MedicalData data = readData();
-            patient.addData(data);
+        System.out.println("[SENSOR] Started monitoring for patient: " + patient.getName());
 
-            if (patient.isConditionDangerous(data)) {
-                MedicineResult medicine = MedicineService.masterCheck.check(data);
+        while (active) {
+            try {
+                int pulse = 65 + random.nextInt(55);
+                int pressure = 110 + random.nextInt(50);
 
-                String text = String.format("ALERT FOR %s (%s) -> Action: %s [Values: %s]",
-                        patient.getName(), getName(), medicine, data);
+                MedicalData data = new MedicalData(pulse, pressure);
+                patient.addData(data);
 
-                hospitalData.addAlert(text);
+                if (patient.isConditionDangerous(data)) {
+                    MedicineResult medicine = MedicineService.masterCheck.check(data);
+
+                    String text = String.format("ALERT FOR %s (%s) -> Action: %s [Values: %s]",
+                            patient.getName(), "Bedside-Monitor", medicine, data);
+
+                    hospitalData.addAlert(text);
+                }
+
+                Thread.sleep(1500);
+
+            } catch (Exception e) {
+                break;
             }
-        } catch (Exception e) {
-            System.err.println("Sensor error: " + e.getMessage());
         }
+        System.out.println("[SENSOR] Stopped monitoring for patient: " + patient.getName());
     }
 }

@@ -8,13 +8,12 @@ import com.medicalapp.sensor.AlertManager;
 import com.medicalapp.sensor.PatientSensor;
 import com.medicalapp.service.ReportService;
 import java.util.Arrays;
-import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.concurrent.*;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException {
-        System.out.println("=== START HOSPITAL MONITORING SYSTEM ===");
+        System.out.println("=== HOSPITAL MONITORING SYSTEM ===");
 
         HospitalData hospital = new HospitalData();
         ReportService reportService = new ReportService();
@@ -26,22 +25,18 @@ public class Main {
         hospital.addPatient(p2);
 
         AlertManager alerts = new AlertManager(hospital);
-        ExecutorService dispatcherExecutor = Executors.newSingleThreadExecutor();
-        dispatcherExecutor.submit(alerts);
 
-        ScheduledExecutorService sensorScheduler = Executors.newScheduledThreadPool(2);
-        sensorScheduler.scheduleAtFixedRate(new PatientSensor(p1, hospital), 0, 1500, TimeUnit.MILLISECONDS);
-        sensorScheduler.scheduleAtFixedRate(new PatientSensor(p2, hospital), 0, 1500, TimeUnit.MILLISECONDS);
+        PatientSensor sensor1 = new PatientSensor(p1, hospital);
+        PatientSensor sensor2 = new PatientSensor(p2, hospital);
 
-        Thread.sleep(5000);
+        Thread.sleep(10000);
 
         System.out.println("\n--- STOPPING SYSTEM ---");
-        sensorScheduler.shutdown();
-        sensorScheduler.awaitTermination(3, TimeUnit.SECONDS);
+
+        sensor1.stop();
+        sensor2.stop();
 
         alerts.stop();
-        dispatcherExecutor.shutdown();
-        dispatcherExecutor.awaitTermination(3, TimeUnit.SECONDS);
 
         System.out.println("\n=== HOSPITAL REPORT ===");
         List<Patient> list = Arrays.asList(p1, p2);
@@ -55,5 +50,7 @@ public class Main {
         System.out.println("\nDemographics:");
         reportService.groupByAge(hospital.getAll())
                 .forEach((group, patients) -> System.out.println(" -> " + group + ": " + patients.size() + " patients"));
+
+        System.out.println("\n");
     }
 }

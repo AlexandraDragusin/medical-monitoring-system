@@ -9,7 +9,6 @@ import com.medicalapp.model.MedicalData;
 import com.medicalapp.repository.HospitalData;
 import org.junit.Before;
 import org.junit.Test;
-import java.util.Collection;
 import static org.junit.Assert.*;
 
 public class Test1 {
@@ -28,7 +27,6 @@ public class Test1 {
 
     @Test
     public void testPatientsPolymorphicRiskAndRepository() {
-        // Valori la limita: Puls 100, Tensiune 138
         MedicalData borderData = new MedicalData(100, 138);
 
         assertTrue(p1.isConditionDangerous(borderData));
