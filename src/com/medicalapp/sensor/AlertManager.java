@@ -22,7 +22,7 @@ public class AlertManager implements Runnable {
             try {
                 String msg = hospitalData.getAlerts().poll(1, TimeUnit.SECONDS);
                 if (msg != null) {
-                    System.out.println("\n🚨 EMERGENCY: " + msg);
+                    System.out.println("\n EMERGENCY: " + msg);
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
