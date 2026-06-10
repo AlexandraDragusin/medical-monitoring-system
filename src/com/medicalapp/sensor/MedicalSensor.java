@@ -1,8 +1,8 @@
 package com.medicalapp.sensor;
 
-import com.medicalapp.model.Vitals;
+import com.medicalapp.model.MedicalData;
 
 public interface MedicalSensor extends Runnable {
-    Vitals readTelemetry();
+    MedicalData readTelemetry();
     String getSensorDeviceName();
 }

@@ -1,13 +1,12 @@
 package com.medicalapp;
 
-import com.medicalapp.model.IcuPatient;
-import com.medicalapp.model.Inpatient;
 import com.medicalapp.model.Patient;
-import com.medicalapp.repository.HospitalRepository;
-import com.medicalapp.sensor.EmergencyDispatcher;
-import com.medicalapp.sensor.PatientMonitorSensor;
+import com.medicalapp.model.PatientCritical;
+import com.medicalapp.model.PatientNormal;
+import com.medicalapp.repository.HospitalData;
+import com.medicalapp.sensor.AlertManager;
+import com.medicalapp.sensor.PatientSensor;
 import com.medicalapp.service.ReportService;
-
 import java.util.Arrays;
 import java.util.IntSummaryStatistics;
 import java.util.List;
@@ -15,55 +14,46 @@ import java.util.concurrent.*;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException {
-        System.out.println("=== SISTEM ENTERPRISE DE MONITORIZARE MEDICALA HIERARHICA ===");
+        System.out.println("=== START HOSPITAL MONITORING SYSTEM ===");
 
-        // 1. Inițializare infrastructură date
-        HospitalRepository hospital = new HospitalRepository();
+        HospitalData hospital = new HospitalData();
         ReportService reportService = new ReportService();
 
-        Patient vasile = new IcuPatient("P-901", "Vasile Gherman", 72, 5);
-        Patient elena = new Inpatient("P-902", "Elena Radu", 29, "Salon 302");
+        Patient p1 = new PatientCritical("P-901", "Vasile Gherman", 72, 5);
+        Patient p2 = new PatientNormal("P-902", "Elena Radu", 29, "302");
 
-        hospital.registerPatient(vasile);
-        hospital.registerPatient(elena);
+        hospital.addPatient(p1);
+        hospital.addPatient(p2);
 
-        // 2. Pornire Dispatcher Alerte Urgență pe fir de execuție separat
-        EmergencyDispatcher dispatcher = new EmergencyDispatcher(hospital);
+        AlertManager alerts = new AlertManager(hospital);
         ExecutorService dispatcherExecutor = Executors.newSingleThreadExecutor();
-        dispatcherExecutor.submit(dispatcher);
+        dispatcherExecutor.submit(alerts);
 
-        // 3. Creare Scheduler Pool pentru Senzori (Simulăm transmiterea periodică)
         ScheduledExecutorService sensorScheduler = Executors.newScheduledThreadPool(2);
+        sensorScheduler.scheduleAtFixedRate(new PatientSensor(p1, hospital), 0, 1500, TimeUnit.MILLISECONDS);
+        sensorScheduler.scheduleAtFixedRate(new PatientSensor(p2, hospital), 0, 1500, TimeUnit.MILLISECONDS);
 
-        // Planificăm senzorii să ruleze la fiecare 1.5 secunde, automat
-        sensorScheduler.scheduleAtFixedRate(new PatientMonitorSensor(vasile, hospital), 0, 1500, TimeUnit.MILLISECONDS);
-        sensorScheduler.scheduleAtFixedRate(new PatientMonitorSensor(elena, hospital), 0, 1500, TimeUnit.MILLISECONDS);
+        Thread.sleep(5000);
 
-        // Lăsăm spitalul să funcționeze live timp de 6 secunde
-        Thread.sleep(6000);
-
-        System.out.println("\n--- OPRIRE CONTROLATA A SISTEMULUI CONCURENT ---");
+        System.out.println("\n--- STOPPING SYSTEM ---");
         sensorScheduler.shutdown();
         sensorScheduler.awaitTermination(3, TimeUnit.SECONDS);
 
-        // Oprim dispatcher-ul de urgențe
-        dispatcher.stopDispatcher();
+        alerts.stop();
         dispatcherExecutor.shutdown();
         dispatcherExecutor.awaitTermination(3, TimeUnit.SECONDS);
 
-        // 4. Generare Rapoarte Analitice cu STREAMS la final de zi
-        System.out.println("\n=== RAPORT ANALITIC MANAGER SPITAL ===");
-        List<Patient> patientList = Arrays.asList(vasile, elena);
+        System.out.println("\n=== HOSPITAL REPORT ===");
+        List<Patient> list = Arrays.asList(p1, p2);
 
-        reportService.getAbsoluteMaxHeartRate(patientList)
-                .ifPresent(max -> System.out.println("Cel mai mare puls critic detectat azi: " + max + " bpm"));
+        reportService.getMaxPulse(list)
+                .ifPresent(max -> System.out.println("Max pulse found today: " + max + " bpm"));
 
-        IntSummaryStatistics vasileStats = reportService.getHeartRateStatsForPatient(vasile);
-        System.out.println("Statistici Puls [" + vasile.getName() + "]: " +
-                "Medie: " + vasileStats.getAverage() + " bpm, Maxim: " + vasileStats.getMax() + " bpm");
+        IntSummaryStatistics stats = reportService.getStats(p1);
+        System.out.println("Stats for " + p1.getName() + " -> Average Pulse: " + stats.getAverage() + " bpm");
 
-        System.out.println("\nDemografie Secții:");
-        reportService.groupPatientsByAgeDemographics(hospital.getAllPatients())
-                .forEach((grup, pacienti) -> System.out.println(" -> " + grup + ": " + pacienti.size() + " pacienți interni"));
+        System.out.println("\nDemographics:");
+        reportService.groupByAge(hospital.getAll())
+                .forEach((group, patients) -> System.out.println(" -> " + group + ": " + patients.size() + " patients"));
     }
 }

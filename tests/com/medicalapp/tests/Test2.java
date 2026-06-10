@@ -1,30 +1,38 @@
 package com.medicalapp.tests;
 
-import com.medicalapp.exception.CriticalVitalsException;
-import com.medicalapp.exception.PatientNotFoundException;
-import com.medicalapp.model.Vitals;
-import com.medicalapp.repository.HospitalRepository;
+import com.medicalapp.exception.BadDataException;
+import com.medicalapp.exception.PatientErrorException;
+import com.medicalapp.model.MedicalData;
+import com.medicalapp.repository.HospitalData;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class Test2 {
 
-    @Test(expected = PatientNotFoundException.class)
+    @Test
     public void testPatientNotFoundException() {
-        HospitalRepository repo = new HospitalRepository();
-
-        // Trebuie să arunce PatientNotFoundException deoarece spitalul e gol
-        repo.findPatientById("ID_FANTOMA");
+        HospitalData hospital = new HospitalData();
+        try {
+            hospital.findPatient("GHOST");
+            fail("Expected PatientErrorException");
+        } catch (PatientErrorException e) {
+            assertEquals("GHOST", e.getPatientId());
+        }
     }
 
-    @Test(expected = CriticalVitalsException.class)
-    public void testCriticalVitalsException() {
-        // Un puls de 250 bpm este imposibil biologic și trebuie să declanșeze excepția customizată
-        new Vitals(250, 120);
+    @Test
+    public void testBadDataException() {
+        try {
+            new MedicalData(250, 120);
+            fail("Expected BadDataException");
+        } catch (BadDataException e) {
+            assertEquals(250, e.getPulse());
+            assertEquals(120, e.getPressure());
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testNegativeVitalsValidation() {
-        // Validare de bază: semnele vitale nu pot fi negative
-        new Vitals(-5, 120);
+    public void testNegativeValues() {
+        new MedicalData(-5, 120);
     }
 }

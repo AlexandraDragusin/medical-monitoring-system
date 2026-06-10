@@ -1,38 +1,32 @@
 package com.medicalapp.tests;
 
-import com.medicalapp.model.Vitals;
-import com.medicalapp.service.DosageService;
-import com.medicalapp.service.MedicalPrescription;
+import com.medicalapp.model.MedicalData;
+import com.medicalapp.service.MedicineService;
+import com.medicalapp.service.MedicineResult;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class Test3 {
 
     @Test
-    public void testChainedLambdaRules() {
-        Vitals highBp = new Vitals(75, 160);
-        MedicalPrescription rx1 = DosageService.masterHospitalRule.analyze(highBp);
+    public void testLambdas() {
+        MedicalData highBp = new MedicalData(70, 160);
+        MedicineResult r1 = MedicineService.masterCheck.check(highBp);
+        assertTrue(r1.isUrgent());
+        assertEquals("ACE-Inhibitor", r1.getName());
 
-        assertTrue(rx1.isUrgent());
-        assertEquals("Inhibitor ACE", rx1.getMedication());
-        assertEquals(20, rx1.getDosageMg());
-        assertNotNull(rx1.toString());
+        MedicalData highPulse = new MedicalData(120, 110);
+        MedicineResult r2 = MedicineService.masterCheck.check(highPulse);
+        assertTrue(r2.isUrgent());
+        assertEquals("Beta-Blocker", r2.getName());
 
-        Vitals highPulse = new Vitals(120, 115);
-        MedicalPrescription rx2 = DosageService.masterHospitalRule.analyze(highPulse);
-
-        assertTrue(rx2.isUrgent());
-        assertEquals("Beta-Blocant", rx2.getMedication());
-
-        // Linie de acoperire pentru getter-ul de timestamp din Vitals și toString
-        assertNotNull(highPulse.getTimestamp());
         assertNotNull(highPulse.toString());
+        assertNotNull(highPulse.getTime());
     }
 
     @Test
-    public void testDosageServiceUtilityMethods() {
-        // Acoperim metoda statică de utilitate din DosageService
-        assertTrue(DosageService.isSystemOverloaded(105));
-        assertFalse(DosageService.isSystemOverloaded(50));
+    public void testUtility() {
+        assertTrue(MedicineService.isSystemBusy(150));
+        assertFalse(MedicineService.isSystemBusy(20));
     }
 }

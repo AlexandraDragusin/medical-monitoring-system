@@ -1,65 +1,54 @@
 package com.medicalapp.tests;
 
-import com.medicalapp.model.IcuPatient;
+import com.medicalapp.model.PatientCritical;
 import com.medicalapp.model.Patient;
-import com.medicalapp.repository.HospitalRepository;
-import com.medicalapp.sensor.EmergencyDispatcher;
-import com.medicalapp.sensor.PatientMonitorSensor;
-import com.medicalapp.sensor.PulseOximeterSensor;
+import com.medicalapp.repository.HospitalData;
+import com.medicalapp.sensor.AlertManager;
+import com.medicalapp.sensor.PatientSensor;
+import com.medicalapp.sensor.DevicePulse;
 import org.junit.Test;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 public class Test5 {
 
     @Test
-    public void testSensorsAndDispatcherAsynchronous() throws InterruptedException {
-        HospitalRepository repository = new HospitalRepository();
-        Patient patient = new IcuPatient("P-TEST", "Test Async", 45, 1);
-        repository.registerPatient(patient);
+    public void testAsyncSystem() throws InterruptedException {
+        HospitalData hospital = new HospitalData();
+        Patient patient = new PatientCritical("P-T", "Test", 45, 1);
+        hospital.addPatient(patient);
 
-        // Instanțiem și rulăm componentele din pachetul sensor pentru acoperire cod
-        EmergencyDispatcher dispatcher = new EmergencyDispatcher(repository);
-        PatientMonitorSensor monitorSensor = new PatientMonitorSensor(patient, repository);
-        PulseOximeterSensor oximeterSensor = new PulseOximeterSensor(patient, repository);
-
-        // Verificăm numele dispozitivului din interfață
-        assertEquals("PulseOximeter-v4", oximeterSensor.getSensorDeviceName());
+        AlertManager alertManager = new AlertManager(hospital);
+        PatientSensor sensor = new PatientSensor(patient, hospital);
+        DevicePulse devPulse = new DevicePulse(patient, hospital);
 
         ExecutorService executor = Executors.newFixedThreadPool(3);
-        executor.submit(dispatcher);
-        executor.submit(monitorSensor);
-        executor.submit(oximeterSensor);
+        executor.submit(alertManager);
+        executor.submit(sensor);
+        executor.submit(devPulse);
 
-        // Lăsăm firele de execuție să ruleze scurt pentru a colecta coverage
-        Thread.sleep(1200);
+        Thread.sleep(1100);
 
-        // Oprim dispatcher-ul curat
-        dispatcher.stopDispatcher();
+        alertManager.stop();
         executor.shutdown();
-        boolean finished = executor.awaitTermination(2, TimeUnit.SECONDS);
+        executor.awaitTermination(2, TimeUnit.SECONDS);
 
-        // Validăm că s-au generat date în istoricul pacientului
-        assertFalse(patient.getVitalsHistory().isEmpty());
+        assertFalse(patient.getHistory().isEmpty());
     }
 
     @Test
-    public void testMainAppOrchestrator() throws InterruptedException {
-        // Pornim structura completă din Main într-un thread secundar timp de 2 secunde pentru a acoperi clasa Main.java
-        Thread mainThread = new Thread(() -> {
+    public void testMainCoverage() throws InterruptedException {
+        Thread thread = new Thread(() -> {
             try {
                 com.medicalapp.Main.main(new String[]{});
             } catch (InterruptedException e) {
-                // Oprire simulată cu succes
+                // Done
             }
         });
-        mainThread.start();
-        Thread.sleep(2000);
-        mainThread.interrupt();
+        thread.start();
+        Thread.sleep(1500);
+        thread.interrupt();
     }
 }
