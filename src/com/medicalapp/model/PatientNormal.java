@@ -8,7 +8,9 @@ public class PatientNormal extends Patient {
         this.roomNumber = roomNumber;
     }
 
-    public String getRoomNumber() { return roomNumber; }
+    public String getRoomNumber() {
+        return roomNumber;
+    }
 
     @Override
     public boolean isConditionDangerous(MedicalData data) {

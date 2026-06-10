@@ -25,10 +25,19 @@ public abstract class Patient {
     }
 
     public List<MedicalData> getHistory() {
+        // returnam o lista nemodificabila pentru a preveni modificarea istoricului din exteriorul clasei
         return Collections.unmodifiableList(history);
     }
 
-    public String getId() { return id; }
-    public String getName() { return name; }
-    public int getAge() { return age; }
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
 }

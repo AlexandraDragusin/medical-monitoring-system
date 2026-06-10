@@ -22,7 +22,7 @@ public class Test5 {
 
         AlertManager alertManager = new AlertManager(hospital);
         PatientSensor sensor = new PatientSensor(patient, hospital);
-        DevicePulse devPulse = new DevicePulse(patient, hospital);
+        DevicePulse devPulse = new DevicePulse(patient);
 
         ExecutorService executor = Executors.newFixedThreadPool(3);
         executor.submit(alertManager);
